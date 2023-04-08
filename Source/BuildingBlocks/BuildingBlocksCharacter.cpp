@@ -220,7 +220,6 @@ void ABuildingBlocksCharacter::RemoveBlock(const FInputActionValue& Value)
 
 void ABuildingBlocksCharacter::SetBlockMode(const FInputActionValue& Value)
 {
-	UE_LOG(LogTemp, Warning, TEXT("SetBlockMode"));
 	if (BlockMode == EBlockMode::EBM_Place)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("EBM_Remove"));
