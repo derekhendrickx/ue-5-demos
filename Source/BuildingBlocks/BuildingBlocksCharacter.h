@@ -41,6 +41,13 @@ class ABuildingBlocksCharacter : public ACharacter
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* PlaceBlockAction;
 
+	/** Place Block Action */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Debug, meta = (AllowPrivateAccess = "true"))
+	uint8  DrawDebugLines : 1;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Block, meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<AActor> Block;
+
 public:
 	ABuildingBlocksCharacter();
 

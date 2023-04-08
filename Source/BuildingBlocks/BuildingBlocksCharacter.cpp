@@ -49,6 +49,8 @@ ABuildingBlocksCharacter::ABuildingBlocksCharacter()
 
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named ThirdPersonCharacter (to avoid direct content references in C++)
+
+	DrawDebugLines = false;
 }
 
 void ABuildingBlocksCharacter::BeginPlay()
@@ -80,15 +82,36 @@ void ABuildingBlocksCharacter::CheckHit()
 
 	if (GetWorld()->LineTraceSingleByChannel(hit, start, end, ECC_Visibility))
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Hit %s"), *hit.GetActor()->GetName());
+		auto hitActor = hit.GetActor();
+		auto hitLocation = hit.Location;
+		auto hitNormal = hit.Normal;
 
-		DrawDebugLine(GetWorld(), start, end, FColor::Green, false, 2.f, ECC_WorldStatic, 1.f);
-		DrawDebugBox(GetWorld(), hit.ImpactPoint, FVector(2.f, 2.f, 2.f), FColor::Green, false, 5.f, ECC_WorldStatic, 1.f);
+		if (DrawDebugLines)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Hit actor %s"), *hitActor->GetName());
+			UE_LOG(LogTemp, Warning, TEXT("Hit location %s"), *hitLocation.ToString());
+			UE_LOG(LogTemp, Warning, TEXT("Hit normal %s"), *hitNormal.ToString());
+
+			DrawDebugLine(GetWorld(), start, end, FColor::Green, false, 2.f, ECC_WorldStatic, 1.f);
+			DrawDebugBox(GetWorld(), hit.ImpactPoint, FVector(2.f, 2.f, 2.f), FColor::Green, false, 5.f, ECC_WorldStatic, 1.f);
+		}
+
+		FVector attachLocation = FVector(hitLocation + hitNormal) - 50.f;
+		attachLocation = attachLocation.GridSnap(100.f);
+
+		FTransform transform = FTransform(attachLocation);
+		FActorSpawnParameters spawnParameters;
+		spawnParameters.Owner = this;
+
+		GetWorld()->SpawnActor<AActor>(Block, transform, spawnParameters);
 	}
 	else {
-		UE_LOG(LogTemp, Warning, TEXT("No Hit"));
+		if (DrawDebugLines)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("No Hit"));
 
-		DrawDebugLine(GetWorld(), start, end, FColor::Red, false, 5.f, ECC_WorldStatic, 1.f);
+			DrawDebugLine(GetWorld(), start, end, FColor::Red, false, 5.f, ECC_WorldStatic, 1.f);
+		}
 	}
 }
 
