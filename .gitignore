@@ -2,7 +2,9 @@ Content/__ExternalActors__/*
 Content/__ExternalObjects__/*
 Content/Characters/*
 Content/LevelPrototyping/*
+Content/ThirdPerson/*
 Content/StarterContent/*
+Platforms/HoloLens/*
 
 # Visual Studio 2015 user specific files
 .vs/
