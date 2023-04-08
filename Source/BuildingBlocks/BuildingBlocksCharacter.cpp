@@ -50,6 +50,7 @@ ABuildingBlocksCharacter::ABuildingBlocksCharacter()
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named ThirdPersonCharacter (to avoid direct content references in C++)
 
+	BlockMode = EBlockMode::EBM_Place;
 	DrawDebugLines = false;
 }
 
@@ -131,6 +132,9 @@ void ABuildingBlocksCharacter::SetupPlayerInputComponent(class UInputComponent* 
 
 		//Remove Block
 		EnhancedInputComponent->BindAction(RemoveBlockAction, ETriggerEvent::Triggered, this, &ABuildingBlocksCharacter::RemoveBlock);
+
+		//Block Mode
+		EnhancedInputComponent->BindAction(BlockModeAction, ETriggerEvent::Triggered, this, &ABuildingBlocksCharacter::SetBlockMode);
 	}
 
 }
@@ -173,6 +177,11 @@ void ABuildingBlocksCharacter::Look(const FInputActionValue& Value)
 
 void ABuildingBlocksCharacter::PlaceBlock(const FInputActionValue& Value)
 {
+	if (BlockMode != EBlockMode::EBM_Place)
+	{
+		return;
+	}
+
 	auto hit = CheckHit();
 	auto hitActor = hit.GetActor();
 	auto hitLocation = hit.Location;
@@ -190,6 +199,11 @@ void ABuildingBlocksCharacter::PlaceBlock(const FInputActionValue& Value)
 
 void ABuildingBlocksCharacter::RemoveBlock(const FInputActionValue& Value)
 {
+	if (BlockMode != EBlockMode::EBM_Remove)
+	{
+		return;
+	}
+
 	auto hit = CheckHit();
 	auto hitActor = hit.GetActor();
 
@@ -201,5 +215,19 @@ void ABuildingBlocksCharacter::RemoveBlock(const FInputActionValue& Value)
 	if (hitActor->IsA(Block))
 	{
 		GetWorld()->DestroyActor(hitActor);
+	}
+}
+
+void ABuildingBlocksCharacter::SetBlockMode(const FInputActionValue& Value)
+{
+	UE_LOG(LogTemp, Warning, TEXT("SetBlockMode"));
+	if (BlockMode == EBlockMode::EBM_Place)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("EBM_Remove"));
+		BlockMode = EBlockMode::EBM_Remove;
+	}
+	else {
+		UE_LOG(LogTemp, Warning, TEXT("EBM_Place"));
+		BlockMode = EBlockMode::EBM_Place;
 	}
 }

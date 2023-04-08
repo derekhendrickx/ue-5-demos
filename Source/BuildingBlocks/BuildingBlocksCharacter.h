@@ -7,6 +7,13 @@
 #include "InputActionValue.h"
 #include "BuildingBlocksCharacter.generated.h"
 
+UENUM(Meta = (Bitflags, UseEnumValuesAsMaskValuesInEditor = "true"))
+enum class EBlockMode : uint8
+{
+	EBM_Place	UMETA(DisplayName = "Place"),
+	EBM_Remove	UMETA(DisplayName = "Remove")
+};
+
 
 UCLASS(config=Game)
 class ABuildingBlocksCharacter : public ACharacter
@@ -45,7 +52,13 @@ class ABuildingBlocksCharacter : public ACharacter
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* RemoveBlockAction;
 
-	/** Place Block Action */
+	/** Block Mode Action */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	class UInputAction* BlockModeAction;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Block, meta = (AllowPrivateAccess = "true", Bitmask, BitmaskEnum = "EBlockMode"))
+	EBlockMode BlockMode;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Debug, meta = (AllowPrivateAccess = "true"))
 	uint8  DrawDebugLines : 1;
 
@@ -72,6 +85,9 @@ protected:
 
 	/** Called for removing block input */
 	void RemoveBlock(const FInputActionValue& Value);
+
+	/** Called for setting block mode input */
+	void SetBlockMode(const FInputActionValue& Value);
 			
 
 protected:
