@@ -135,6 +135,9 @@ void ABuildingBlocksCharacter::SetupPlayerInputComponent(class UInputComponent* 
 
 		//Block Mode
 		EnhancedInputComponent->BindAction(BlockModeAction, ETriggerEvent::Triggered, this, &ABuildingBlocksCharacter::SetBlockMode);
+
+		//Debug Mode
+		EnhancedInputComponent->BindAction(DebugModeAction, ETriggerEvent::Triggered, this, &ABuildingBlocksCharacter::ToggleDebugMode);
 	}
 
 }
@@ -229,4 +232,9 @@ void ABuildingBlocksCharacter::SetBlockMode(const FInputActionValue& Value)
 		UE_LOG(LogTemp, Warning, TEXT("EBM_Place"));
 		BlockMode = EBlockMode::EBM_Place;
 	}
+}
+
+void ABuildingBlocksCharacter::ToggleDebugMode(const FInputActionValue& Value)
+{
+	DrawDebugLines = ~DrawDebugLines;
 }

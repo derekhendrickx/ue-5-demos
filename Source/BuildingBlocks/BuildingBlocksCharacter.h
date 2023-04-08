@@ -56,10 +56,14 @@ class ABuildingBlocksCharacter : public ACharacter
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* BlockModeAction;
 
+	/** Debug Mode Action */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	class UInputAction* DebugModeAction;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Block, meta = (AllowPrivateAccess = "true", Bitmask, BitmaskEnum = "EBlockMode"))
 	EBlockMode BlockMode;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Debug, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Debug, meta = (AllowPrivateAccess = "true"))
 	uint8  DrawDebugLines : 1;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Block, meta = (AllowPrivateAccess = "true"))
@@ -88,6 +92,9 @@ protected:
 
 	/** Called for setting block mode input */
 	void SetBlockMode(const FInputActionValue& Value);
+
+	/** Called for toggling debug mode input */
+	void ToggleDebugMode(const FInputActionValue& Value);
 			
 
 protected:
@@ -102,5 +109,9 @@ public:
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 	/** Returns FollowCamera subobject **/
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
+
+	FORCEINLINE EBlockMode GetBlockMode() const { return BlockMode; }
+
+	FORCEINLINE uint8 GetDrawDebugLines() const { return DrawDebugLines; }
 };
 
