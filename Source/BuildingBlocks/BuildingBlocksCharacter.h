@@ -41,6 +41,10 @@ class ABuildingBlocksCharacter : public ACharacter
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* PlaceBlockAction;
 
+	/** Remove Block Action */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	class UInputAction* RemoveBlockAction;
+
 	/** Place Block Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Debug, meta = (AllowPrivateAccess = "true"))
 	uint8  DrawDebugLines : 1;
@@ -52,7 +56,7 @@ public:
 	ABuildingBlocksCharacter();
 
 private:
-	void CheckHit();
+	FHitResult CheckHit();
 	
 
 protected:
@@ -65,6 +69,9 @@ protected:
 
 	/** Called for placing block input */
 	void PlaceBlock(const FInputActionValue& Value);
+
+	/** Called for removing block input */
+	void RemoveBlock(const FInputActionValue& Value);
 			
 
 protected:

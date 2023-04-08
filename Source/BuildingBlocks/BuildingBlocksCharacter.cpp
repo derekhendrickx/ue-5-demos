@@ -68,7 +68,7 @@ void ABuildingBlocksCharacter::BeginPlay()
 	}
 }
 
-void ABuildingBlocksCharacter::CheckHit()
+FHitResult ABuildingBlocksCharacter::CheckHit()
 {
 	FVector location;
 	FRotator rotation;
@@ -95,15 +95,6 @@ void ABuildingBlocksCharacter::CheckHit()
 			DrawDebugLine(GetWorld(), start, end, FColor::Green, false, 2.f, ECC_WorldStatic, 1.f);
 			DrawDebugBox(GetWorld(), hit.ImpactPoint, FVector(2.f, 2.f, 2.f), FColor::Green, false, 5.f, ECC_WorldStatic, 1.f);
 		}
-
-		FVector attachLocation = FVector(hitLocation + hitNormal) - 50.f;
-		attachLocation = attachLocation.GridSnap(100.f);
-
-		FTransform transform = FTransform(attachLocation);
-		FActorSpawnParameters spawnParameters;
-		spawnParameters.Owner = this;
-
-		GetWorld()->SpawnActor<AActor>(Block, transform, spawnParameters);
 	}
 	else {
 		if (DrawDebugLines)
@@ -113,6 +104,8 @@ void ABuildingBlocksCharacter::CheckHit()
 			DrawDebugLine(GetWorld(), start, end, FColor::Red, false, 5.f, ECC_WorldStatic, 1.f);
 		}
 	}
+
+	return hit;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -135,6 +128,9 @@ void ABuildingBlocksCharacter::SetupPlayerInputComponent(class UInputComponent* 
 
 		//Place Block
 		EnhancedInputComponent->BindAction(PlaceBlockAction, ETriggerEvent::Triggered, this, &ABuildingBlocksCharacter::PlaceBlock);
+
+		//Remove Block
+		EnhancedInputComponent->BindAction(RemoveBlockAction, ETriggerEvent::Triggered, this, &ABuildingBlocksCharacter::RemoveBlock);
 	}
 
 }
@@ -177,7 +173,33 @@ void ABuildingBlocksCharacter::Look(const FInputActionValue& Value)
 
 void ABuildingBlocksCharacter::PlaceBlock(const FInputActionValue& Value)
 {
-	CheckHit();
+	auto hit = CheckHit();
+	auto hitActor = hit.GetActor();
+	auto hitLocation = hit.Location;
+	auto hitNormal = hit.Normal;
+
+	FVector attachLocation = FVector(hitLocation + hitNormal) - 50.f;
+	attachLocation = attachLocation.GridSnap(100.f);
+
+	FTransform transform = FTransform(attachLocation);
+	FActorSpawnParameters spawnParameters;
+	spawnParameters.Owner = this;
+
+	GetWorld()->SpawnActor<AActor>(Block, transform, spawnParameters);
 }
 
+void ABuildingBlocksCharacter::RemoveBlock(const FInputActionValue& Value)
+{
+	auto hit = CheckHit();
+	auto hitActor = hit.GetActor();
 
+	if (!IsValid(hitActor))
+	{
+		return;
+	}
+
+	if (hitActor->IsA(Block))
+	{
+		GetWorld()->DestroyActor(hitActor);
+	}
+}
