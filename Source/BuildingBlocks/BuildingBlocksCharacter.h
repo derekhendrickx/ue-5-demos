@@ -45,7 +45,7 @@ public:
 	ABuildingBlocksCharacter();
 
 private:
-	void Temp();
+	void CheckHit();
 	
 
 protected:

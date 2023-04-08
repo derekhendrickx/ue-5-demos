@@ -66,7 +66,7 @@ void ABuildingBlocksCharacter::BeginPlay()
 	}
 }
 
-void ABuildingBlocksCharacter::Temp()
+void ABuildingBlocksCharacter::CheckHit()
 {
 	FVector location;
 	FRotator rotation;
@@ -154,7 +154,7 @@ void ABuildingBlocksCharacter::Look(const FInputActionValue& Value)
 
 void ABuildingBlocksCharacter::PlaceBlock(const FInputActionValue& Value)
 {
-	Temp();
+	CheckHit();
 }
 
 
