@@ -79,7 +79,7 @@ FHitResult ABuildingBlocksCharacter::CheckHit()
 	FVector CameraForwardVector = FollowCamera->GetComponentRotation().Vector();
 
 	FVector start = CameraLocation;
-	FVector end = start + (CameraForwardVector * (GetCameraBoom()->TargetArmLength + 250.f));
+	FVector end = start + (CameraForwardVector * (GetCameraBoom()->TargetArmLength + 500.f));
 
 	if (GetWorld()->LineTraceSingleByChannel(hit, start, end, ECC_Visibility))
 	{
@@ -89,10 +89,6 @@ FHitResult ABuildingBlocksCharacter::CheckHit()
 
 		if (DrawDebugLines)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Hit actor %s"), *hitActor->GetName());
-			UE_LOG(LogTemp, Warning, TEXT("Hit location %s"), *hitLocation.ToString());
-			UE_LOG(LogTemp, Warning, TEXT("Hit normal %s"), *hitNormal.ToString());
-
 			DrawDebugLine(GetWorld(), start, end, FColor::Green, false, 2.f, ECC_WorldStatic, 1.f);
 			DrawDebugBox(GetWorld(), hit.ImpactPoint, FVector(2.f, 2.f, 2.f), FColor::Green, false, 5.f, ECC_WorldStatic, 1.f);
 		}
@@ -100,8 +96,6 @@ FHitResult ABuildingBlocksCharacter::CheckHit()
 	else {
 		if (DrawDebugLines)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("No Hit"));
-
 			DrawDebugLine(GetWorld(), start, end, FColor::Red, false, 5.f, ECC_WorldStatic, 1.f);
 		}
 	}
@@ -195,7 +189,7 @@ void ABuildingBlocksCharacter::PlaceBlock(const FInputActionValue& Value)
 
 	FTransform transform = FTransform(attachLocation);
 	FActorSpawnParameters spawnParameters;
-	spawnParameters.Owner = this;
+	spawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::DontSpawnIfColliding;
 
 	GetWorld()->SpawnActor<AActor>(Block, transform, spawnParameters);
 }
