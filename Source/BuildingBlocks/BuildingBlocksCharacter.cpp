@@ -49,9 +49,6 @@ ABuildingBlocksCharacter::ABuildingBlocksCharacter()
 
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named ThirdPersonCharacter (to avoid direct content references in C++)
-
-	BlockMode = EBlockMode::EBM_Place;
-	DrawDebugLines = false;
 }
 
 void ABuildingBlocksCharacter::BeginPlay()
@@ -71,35 +68,34 @@ void ABuildingBlocksCharacter::BeginPlay()
 
 FHitResult ABuildingBlocksCharacter::CheckHit()
 {
-	FVector location;
-	FHitResult hit;
+	const FVector Location;
+	FHitResult Hit;
 
-	FVector CameraLocation = FollowCamera->GetComponentLocation();
-	FVector CameraForwardVector = FollowCamera->GetComponentRotation().Vector();
+	const FVector CameraLocation = FollowCamera->GetComponentLocation();
+	const FVector CameraForwardVector = FollowCamera->GetComponentRotation().Vector();
 
-	FVector start = CameraLocation;
-	FVector end = start + (CameraForwardVector * (GetCameraBoom()->TargetArmLength + 500.f));
+	const FVector Start = CameraLocation;
+	const FVector End = Start + (CameraForwardVector * (GetCameraBoom()->TargetArmLength + 500.f));
+	FCollisionQueryParams CollisionQueryParams;
+	CollisionQueryParams.bDebugQuery = true;
 
-	if (GetWorld()->LineTraceSingleByChannel(hit, start, end, ECC_Visibility))
+	if (GetWorld()->LineTraceSingleByChannel(Hit, Start, End, ECC_Visibility, CollisionQueryParams))
 	{
-		auto hitActor = hit.GetActor();
-		auto hitLocation = hit.Location;
-		auto hitNormal = hit.Normal;
 
-		if (DrawDebugLines)
+		if (bDrawDebugLines)
 		{
-			DrawDebugLine(GetWorld(), start, end, FColor::Green, false, 2.f, ECC_WorldStatic, 1.f);
-			DrawDebugBox(GetWorld(), hit.ImpactPoint, FVector(2.f, 2.f, 2.f), FColor::Green, false, 5.f, ECC_WorldStatic, 1.f);
+			DrawDebugLine(GetWorld(), Start, End, FColor::Green, false, 2.f, ECC_WorldStatic, 1.f);
+			DrawDebugBox(GetWorld(), Hit.ImpactPoint, FVector(2.f, 2.f, 2.f), FColor::Green, false, 5.f, ECC_WorldStatic, 1.f);
 		}
 	}
 	else {
-		if (DrawDebugLines)
+		if (bDrawDebugLines)
 		{
-			DrawDebugLine(GetWorld(), start, end, FColor::Red, false, 5.f, ECC_WorldStatic, 1.f);
+			DrawDebugLine(GetWorld(), Start, End, FColor::Red, false, 5.f, ECC_WorldStatic, 1.f);
 		}
 	}
 
-	return hit;
+	return Hit;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -178,19 +174,24 @@ void ABuildingBlocksCharacter::PlaceBlock(const FInputActionValue& Value)
 		return;
 	}
 
-	auto hit = CheckHit();
-	auto hitActor = hit.GetActor();
-	auto hitLocation = hit.Location;
-	auto hitNormal = hit.Normal;
+	const auto Hit = CheckHit();
+	const auto HitActor = Hit.GetActor();
+	const auto HitLocation = Hit.Location;
+	const auto HitNormal = Hit.Normal;
 
-	FVector attachLocation = FVector(hitLocation + hitNormal) - 50.f;
-	attachLocation = attachLocation.GridSnap(100.f);
+	const FVector AttachLocation = FVector(HitLocation + HitNormal) - 50.f;
+	const FVector AttachLocationSnappedToGrid = AttachLocation.GridSnap(100.f);
 
-	FTransform transform = FTransform(attachLocation);
-	FActorSpawnParameters spawnParameters;
-	spawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::DontSpawnIfColliding;
+	if (bDrawDebugLines)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, FString::Printf(TEXT("Attach Location: Original = %s, With Snap = %s"), *AttachLocation.ToString(), *AttachLocationSnappedToGrid.ToString()));
+	}
 
-	GetWorld()->SpawnActor<AActor>(Block, transform, spawnParameters);
+	const FTransform Transform = FTransform(AttachLocationSnappedToGrid);
+	FActorSpawnParameters SpawnParameters;
+	SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::DontSpawnIfColliding;
+
+	GetWorld()->SpawnActor<AActor>(Block, Transform, SpawnParameters);
 }
 
 void ABuildingBlocksCharacter::RemoveBlock(const FInputActionValue& Value)
@@ -200,17 +201,17 @@ void ABuildingBlocksCharacter::RemoveBlock(const FInputActionValue& Value)
 		return;
 	}
 
-	auto hit = CheckHit();
-	auto hitActor = hit.GetActor();
+	const auto Hit = CheckHit();
+	const auto HitActor = Hit.GetActor();
 
-	if (!IsValid(hitActor))
+	if (!IsValid(HitActor))
 	{
 		return;
 	}
 
-	if (hitActor->IsA(Block))
+	if (HitActor->IsA(Block))
 	{
-		GetWorld()->DestroyActor(hitActor);
+		GetWorld()->DestroyActor(HitActor);
 	}
 }
 
@@ -227,5 +228,5 @@ void ABuildingBlocksCharacter::SetBlockMode(const FInputActionValue& Value)
 
 void ABuildingBlocksCharacter::ToggleDebugMode(const FInputActionValue& Value)
 {
-	DrawDebugLines = ~DrawDebugLines;
+	bDrawDebugLines = !bDrawDebugLines;
 }

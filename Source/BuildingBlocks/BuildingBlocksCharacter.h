@@ -7,7 +7,7 @@
 #include "InputActionValue.h"
 #include "BuildingBlocksCharacter.generated.h"
 
-UENUM(Meta = (Bitflags, UseEnumValuesAsMaskValuesInEditor = "true"))
+UENUM()
 enum class EBlockMode : uint8
 {
 	EBM_Place	UMETA(DisplayName = "Place"),
@@ -61,10 +61,10 @@ class ABuildingBlocksCharacter : public ACharacter
 	class UInputAction* DebugModeAction;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Block, meta = (AllowPrivateAccess = "true", Bitmask, BitmaskEnum = "EBlockMode"))
-	EBlockMode BlockMode;
+	EBlockMode BlockMode = EBlockMode::EBM_Place;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Debug, meta = (AllowPrivateAccess = "true"))
-	uint8  DrawDebugLines : 1;
+	bool bDrawDebugLines = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Block, meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<AActor> Block;
@@ -112,6 +112,6 @@ public:
 
 	FORCEINLINE EBlockMode GetBlockMode() const { return BlockMode; }
 
-	FORCEINLINE uint8 GetDrawDebugLines() const { return DrawDebugLines; }
+	FORCEINLINE bool GetDrawDebugLines() const { return bDrawDebugLines; }
 };
 
