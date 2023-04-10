@@ -72,7 +72,6 @@ void ABuildingBlocksCharacter::BeginPlay()
 FHitResult ABuildingBlocksCharacter::CheckHit()
 {
 	FVector location;
-	FRotator rotation;
 	FHitResult hit;
 
 	FVector CameraLocation = FollowCamera->GetComponentLocation();
@@ -219,11 +218,9 @@ void ABuildingBlocksCharacter::SetBlockMode(const FInputActionValue& Value)
 {
 	if (BlockMode == EBlockMode::EBM_Place)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("EBM_Remove"));
 		BlockMode = EBlockMode::EBM_Remove;
 	}
 	else {
-		UE_LOG(LogTemp, Warning, TEXT("EBM_Place"));
 		BlockMode = EBlockMode::EBM_Place;
 	}
 }
